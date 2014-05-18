@@ -1,111 +1,124 @@
-// bash for loop toy problem automate 2014-05-17.md
+*** 
+####TL;DR Goal - learn how to append lines of code/text to specific files within different sub-directories using bash commands
 
-[john goodman] am i the only one here who wants to resubmit all my toy problems and check what to work on?
-####TL;DR Goal - learn how to append lines of code/text to specific files within different sub-directories using bash commands (4 lines!!!)
-
-####TL;DR Solution - run this inside any root directory with immediate sub-directories that contain .js files you want to append to:
-
+####TL;DR Solution - run this inside the root directory that contain sub-directories of .js files you want to append to:
     # appends '// comment' to selected .js files
     for file in ./*/*.js
     do
-    echo "// comment" >> "$file"
+      echo "// comment" >> "$file"
     done
 #####Try before you buy:
-In case you are not comfortable running the above code, right-click and download [this test script](https://raw.githubusercontent.com/gregorylull/blog/master/bashForLoopToyProblem_2014-05-17/buildDir.sh) to any folder, take a look, then enter the following commands in the console:
+In case you are not comfortable running the code above, right-click and download [this test script](https://raw.githubusercontent.com/gregorylull/blog/master/bashForLoopToyProblem_2014-05-17/buildDir.sh) to any folder, take a look, then enter the following commands in the console:
 
     # gives permission to execute the script
     chmod 755 buildDir.sh
     # this executes the script
     ./buildDir.sh
 
-That should get you started, read 5 mins more if you would like to increase your bash stats!
+That should get you started. Read 5 mins more if you would like to increase your bash stats!
 
-####My backstory, aka my confession:
-Two nights ago I did a very anti-programmer thing. I had a git respository that I wanted to re-submit to an automated solution checker. So I opened each file, looked around to remind myself what the file contained, and added a comment.
+###My backstory, aka my confession:
+A couple of nights ago I did a very anti-programmer thing. I had a git repository that I wanted to re-submit to an automated solution checker, so I added a comment to each file and made a pull request. Meaning, I manually added the same comment to 40 files in 40 different directories. 
 
-I did not realize it at the time, but the end result was me manaually adding a comment to 40 files in 40 different directories. 
-
-Shame, guilt, and reflection ensued : It was time for me to go beyond cd and mv.
+Shame, guilt, and reflection ensued: It was time for me to go beyond cd, rm, and mv.
 
 ####Tutorial Intro:
-There are a lot of great guides out there for learning Bash, a Unix shell*, so I will cover only what we need to understand the for-loop provided above (...and some fun stuff of course)
+There are a lot of [great guides](http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO.html#toc5) out there for learning Bash, a Unix shell*, so I will cover only the bare minimum (...and some fun stuff of course).
 
-####For-loop structure: 
-The bash for-loop iterates over space-separated items
+######*For a better understanding of terminology between shell/bash, console/terminal/tty, check out this [stack exchange answer](http://unix.stackexchange.com/questions/4126/what-is-the-exact-difference-between-a-terminal-a-shell-a-tty-and-a-con?newreg=662292c76b484f2f8cb55ba57ce16c7a )
+####Variables:
+Do not worry about 'polluting' the environment, your variables will be gone as soon as you close your terminal window, so have at it.
+Also, uppercase is generally reserved for [global/environment](http://www.tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_02.html) variables, so use lowercase variable names.
 
-    for i in "one" "two" "three"
-    do
-    echo "$i"  # outputs: one two three
-    done
-
-1. A `return` separates commands 
-2. semi-colons are for single-line commands:
-`for i in "one two three"; do echo "$i"; done;`
-3. `echo` automatically adds a newline
-
-####Variable declaration, assignment, and expansion:
-*Note:* don't worry about 'polluting' the environment, as soon as you close your terminal window, which is closing an instance of the bash shell, your declared variables will be gone, so have at it!! Also, uppercase is generally reserved for global/environment variables, so just play around with lowercase.
-
-####Declaration and Assignment
-Variables are case-sensitive and assignments must have no spaces in between them, otherwise it is interpreted as a command being passed arguments
+####Declaration, Assignment, and Expansion
+Variables are case-sensitive and assignments cannot have spaces in between them, otherwise it is interpreted as a command being passed arguments
 
     name=greg    # works!
     name = greg  # err - name: command not found
 
-####Variable value retrieval and expansion
-to retrieve the value of the variable, prefix with a bang $
+
+To retrieve the value of the variable, prefix with a bang $ which 'expands' it
 
     name=greg
     echo $name  # outputs: greg
     echo name   # outputs: name
-
     # variables are expanded within double quotes
     echo "hi $name"  # outputs: hi greg
     echo 'hi $name'  # outputs: hi $name
 
-#####*Note:* I use echo for my examples because it is easier to understand and it automatically adds a newline after the output. However, use printf if you want to have more control over the formatting of your strings.
+######*Note:* I use echo for my examples because it is visually cleaner and it automatically adds a newline after the output. [Use printf](http://unix.stackexchange.com/questions/65803/why-is-printf-better-than-echo) if you want to have more control over the formatting of your strings.
 
-####Input/Output Redirection SUPER POWER!!!!
-There are always three default files/streams that are open, and 'resets' after each use
-stdin  - standard in, the keyboard
-stdout - standard out, outputs to the screen
-stderr - standard error, outputs to the screen
+####For-loop structure: 
+The bash for-loop iterates over space-separated items
+  
+    for i in "one" "two" "three"
+    do
+      echo "$i" 
+    done 
+    # outputs: 
+    one 
+    two
+    three
 
-When we use 'echo' its output is going to stdout, which is why we visually see it in the console. However, we can redirect that output and use it in other commands, or create files from it.
+1. `return` separates commands
+2. statements between keywords `do` and `done` are executed once per loop
+3. semi-colons are necessary for single-line commands:
+`for i in "one" "two" "three"; do echo "$i"; done;`
 
-    # notice nothing outputs to the screen
-    # >  overwrites, or creates a new file
-    # >> appends, or creates a new file
-    echo '// newly created file' > file1.txt
-    echo '// overwrites previous comment' > file1.txt
-    echo '// appends this comment' >> file1.txt
 
-####Filename expansion, aka 'globbing', are useful for creating a list
 
-    # * asterisks are wild cards
+####Input/Output [redirection](http://www.tldp.org/LDP/abs/html/io-redirection.html) SUPER POWER
+There are always three default files/streams that are open which 'resets' after each use: standard in (keyboard), standard out (screen), and standard error (screen).
+
+When we use `echo`, its output is going to stdout, which is why we visually see it in the console. However, we can redirect that output and use it in other commands and/or create files from it!
+
+    # again, because we redirect the output, notice
+    # that nothing below gets displayed to console
+    
+    #  >  overwrites, or creates a new file
+    echo '// creates file1.txt' > file1.txt
+    echo '// overwrites file1.txt' > file1.txt
+    
+    #  >> appends, or creates a new file
+    echo '// appends to end' >> file1.txt
+
+####Filename expansion, aka ['globbing'](http://www.tldp.org/LDP/abs/html/globbingref.html)
+This is useful for creating a list/argument that for-loops and other common commands could use. 
+
+    # * asterisks are wildcards
     # ? question marks are any single char
     touch test.js   # creates a 'test.js' file
-    ls *.js         # lists all js file in the dir
-    ls te*.js       # lists testfile.js
-    echo t???.js    # outputs: testfile.js
-    echo ./*.js     # prefixed with ./ for other cmds
+    ls *.js         # lists .js files in the current dir
+    echo t???.js    # outputs: test.js
+    echo ./*.js     # prefixed with ./
 
 
 ####Bringing it all together
-So far we have covered variable expansion, for-loop structure, globbing, and redirection.
+Let's revisit the solution, everything should make much more sense now:
 
     for file in ./*/*.js
     do
-    echo "// comment" >> "$file"
+      echo "// comment" >> "$file"
     done
 1. `./*` looks at all immediate sub-directories
-2. `/*.js` within each sub-directory, globbing creates a list of .js files
-3. `>>` redirects the output of the string and appends it to each of the found .js files
-4.`"$file"` is enclosed in quotes because if there was a file with a filename that had spaces (`greg resume.doc`), it would break the globbing function.
+2. `/*.js` **globbing** expands the wildcard and finds all .js files within each sub-directory
+3. `>>` **redirects** the output of the string and **appends** it to each of the found .js files
+#####Common pitfall:
+`"$file"` is enclosed in quotes to prevent ambiguity errors. Imagine there were no quotes and if there were a filename that contained spaces (`greg resume.doc`). After `$file` is **expanded**, are you redirecting the output to `greg`, or `greg resume.doc`?
 
-Thank you for reading, there's some more bonus stuff below if you're curious about math and how things break!
+#### Conclusion
+Combining what we have learned about variables, the for-loop structure, redirection, and globbing, just imagine all the possibilities out there waiting for you and my future posts!
 
-Thank you for reading, there's some more bonus stuff below if you're curious about math and how things break!
+* for-loops that add boiler plate header and footers to all your original content. **EASY.**
+* scripts that alter your git repository history and author information. **SNEAKY?**
+* recursively traverse directory trees and .js files to find out the average length of all your variable names using regex.
+**WOW!**
+
+Thank you for reading!
+
+
+
+
 
 BONUS / Common gotchas!
 # for basic arithmetic (no floats), wrap the expression in double parens
